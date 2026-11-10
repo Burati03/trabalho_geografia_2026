@@ -9,7 +9,7 @@ aside{position:sticky;top:0;height:100vh;background:var(--verde-esc);color:#E6F0
 .strata{position:absolute;left:0;top:0;bottom:0;width:10px;display:flex;flex-direction:column;transform-origin:top;animation:cresce .9s ease-out}
 .strata i{flex:1}
 @keyframes cresce{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-aside h1{font-size:30px;letter-spacing:-.5px}
+.brand-logo{display:block;width:100%;max-width:205px;height:auto;align-self:center}
 nav{display:flex;flex-direction:column;gap:2px}
 nav a{color:#CFE0D3;text-decoration:none;padding:9px 12px;border-left:3px solid transparent}
 nav a:hover{background:rgba(255,255,255,.07)}
@@ -48,6 +48,7 @@ button{cursor:pointer}button:disabled{opacity:.45;cursor:default}
 .abas{display:flex}.abas button{border-radius:0}.abas button[aria-selected=true]{background:var(--verde-esc);color:#fff;border-color:var(--verde-esc)}
 .botao{margin-left:auto;background:var(--verde);color:#fff;padding:8px 14px;border-radius:3px;text-decoration:none;font-weight:600}
 .tabela{overflow-x:auto;background:#fff;border:1px solid var(--linha);margin-bottom:12px}
+.tabela-fontes table{min-width:900px}
 table{border-collapse:collapse;width:100%;font-size:13.5px}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--linha);vertical-align:top}
 th{background:#EAF0EB;font-weight:600;white-space:nowrap}

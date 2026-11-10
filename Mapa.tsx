@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Filtros } from "../api";
-import MapView from "../MapView";
-import { FiltroBar, iso } from "../ui";
+import { Filtros } from "./api";
+import MapView from "./MapView";
+import { FiltroBar, iso } from "./ui";
 
 export default function Mapa() {
   const [f, setF] = useState<Filtros>({ de: iso(30) });

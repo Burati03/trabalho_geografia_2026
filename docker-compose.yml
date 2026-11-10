@@ -9,7 +9,7 @@ services:
       interval: 5s
       retries: 10
   api:
-    build: .
+    build: { context: ., dockerfile: Dockerfile }
     env_file: .env
     environment: { DATABASE_URL: "postgresql://biomas:biomas@db:5432/biomas" }
     ports: ["8000:8000"]

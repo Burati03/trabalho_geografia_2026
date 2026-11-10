@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Filtros, R, qs, useApi } from "../api";
-import MapView from "../MapView";
-import { Estado, FiltroBar, TIPOS, dia, iso, nf } from "../ui";
+import { Filtros, R, qs, useApi } from "./api";
+import MapView from "./MapView";
+import { Estado, FiltroBar, TIPOS, dia, iso, nf } from "./ui";
 
 const POR_PAG = 50;
 export default function Alertas() {

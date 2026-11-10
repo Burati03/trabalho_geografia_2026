@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Filtros, R, useApi } from "../api";
-import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "../ui";
+import { Filtros, R, useApi } from "./api";
+import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "./ui";
 
 export default function Dashboard() {
   const [f, setF] = useState<Filtros>({ de: iso(30) });
@@ -31,17 +31,17 @@ export default function Dashboard() {
       <div className="grade">
         <section className="painel largo"><h3>Alertas por semana</h3>
           <Estado erro={ser.erro} carregando={ser.carregando} vazio={ser.data?.length === 0 && "Sem alertas no período. Rode uma coleta ou ajuste os filtros."}>
-            <ResponsiveContainer height={260}><LineChart data={ser.data!}><CartesianGrid stroke="#E3EAE4" /><XAxis dataKey="periodo" fontSize={12} /><YAxis fontSize={12} allowDecimals={false} /><Tooltip /><Legend formatter={(k) => TIPOS[k] || k} />
+            <ResponsiveContainer height={260}><LineChart data={ser.data || []}><CartesianGrid stroke="#E3EAE4" /><XAxis dataKey="periodo" fontSize={12} /><YAxis fontSize={12} allowDecimals={false} /><Tooltip /><Legend formatter={(k) => TIPOS[k] || k} />
               {Object.keys(TIPOS).map((k) => <Line key={k} type="monotone" dataKey={k} stroke={COR_TIPO[k]} strokeWidth={2} dot={false} />)}</LineChart></ResponsiveContainer>
           </Estado></section>
         <section className="painel"><h3>Comparação entre biomas</h3>
           <Estado erro={bio.erro} carregando={bio.carregando}>
-            <ResponsiveContainer height={260}><BarChart data={bio.data!} layout="vertical" margin={{ left: 20 }}><CartesianGrid stroke="#E3EAE4" horizontal={false} /><XAxis type="number" fontSize={12} allowDecimals={false} /><YAxis type="category" dataKey="nome" width={130} fontSize={12} /><Tooltip />
+            <ResponsiveContainer height={260}><BarChart data={bio.data || []} layout="vertical" margin={{ left: 20 }}><CartesianGrid stroke="#E3EAE4" horizontal={false} /><XAxis type="number" fontSize={12} allowDecimals={false} /><YAxis type="category" dataKey="nome" width={130} fontSize={12} /><Tooltip />
               <Bar dataKey="alertas" name="Alertas">{bio.data?.map((b) => <Cell key={b.slug} fill={BIOMA_COR[b.slug]} />)}</Bar></BarChart></ResponsiveContainer>
           </Estado></section>
         <section className="painel"><h3>Área afetada por tipo de impacto (ha)</h3>
           <Estado erro={tipo.erro} carregando={tipo.carregando} vazio={tipo.data?.length === 0 && "Sem dados no período."}>
-            <ResponsiveContainer height={260}><BarChart data={tipo.data!.map((t) => ({ ...t, nome: TIPOS[t.tipo], area: Number(t.area) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="nome" fontSize={12} /><YAxis fontSize={12} /><Tooltip />
+            <ResponsiveContainer height={260}><BarChart data={(tipo.data || []).map((t) => ({ ...t, nome: TIPOS[t.tipo], area: Number(t.area) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="nome" fontSize={12} /><YAxis fontSize={12} /><Tooltip />
               <Bar dataKey="area" name="Hectares">{tipo.data?.map((t) => <Cell key={t.tipo} fill={COR_TIPO[t.tipo]} />)}</Bar></BarChart></ResponsiveContainer>
             <p className="nota">Focos de calor não têm área medida pela fonte e não entram neste total.</p>
           </Estado></section>

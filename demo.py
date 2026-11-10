@@ -1,10 +1,7 @@
 """Alertas SINTÉTICOS (demo=true, fonte 'demo') para testar a interface. Posições ilustrativas, não são ocorrências reais."""
 import random
 from datetime import date, timedelta
-try:
-    from . import db
-except ImportError:
-    import db
+from . import db
 
 CAIXAS = {"amazonia": (-70, -9, -50, -1), "cerrado": (-52, -18, -45, -8), "pantanal": (-58, -20, -55.5, -16),
           "mata-atlantica": (-48, -26, -41, -18), "caatinga": (-43, -12, -38, -6), "pampa": (-56, -31, -52, -29),

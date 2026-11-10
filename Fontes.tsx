@@ -1,5 +1,5 @@
-import { R, useApi } from "../api";
-import { Estado, dh } from "../ui";
+import { R, useApi } from "./api";
+import { Estado, dh } from "./ui";
 
 const ROTULO: Record<string, string> = { ativa: "Ativa", erro: "Com erro", nao_configurada: "Sem chave", planejada: "Planejada", pendente: "Aguardando coleta", demo: "Demonstração" };
 
@@ -9,7 +9,8 @@ export default function Fontes() {
     <>
       <header className="topo"><h2>Fontes e metodologia</h2><p>De onde vem cada número e o que ele significa.</p></header>
       <Estado erro={d.erro} carregando={d.carregando}>
-        <div className="tabela"><table>
+        <div className="tabela tabela-fontes" tabIndex={0} aria-label="Tabela de fontes e metodologia">
+          <table>
           <thead><tr><th>Instituição</th><th>Dados</th><th>Tipo</th><th>Situação</th><th>Última atualização</th><th>Link</th></tr></thead>
           <tbody>{d.data?.map((x) => (
             <tr key={x.id}><td>{x.nome_instituicao}</td><td>{x.descricao}{x.mensagem && <small className="msg"><br />{x.mensagem}</small>}</td><td>{x.tipo_dados}</td>

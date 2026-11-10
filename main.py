@@ -4,11 +4,10 @@ from datetime import date
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
-try:
-    from . import collectors as c, db, demo
-except ImportError:
-    import collectors as c, db, demo
+from pathlib import Path
+from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
+from . import collectors as c, db, demo
 
 BASE = "FROM alertas a LEFT JOIN biomas b ON b.id=a.bioma_id JOIN fontes_dados f ON f.id=a.fonte_id"
 
@@ -28,7 +27,7 @@ async def lifespan(app):
     sch.shutdown(wait=False)
 
 
-app = FastAPI(title="Biomas Monitor", lifespan=lifespan)
+app = FastAPI(title="Renova Terra Monitoramento", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["GET", "POST"], allow_headers=["*"])
 
 
@@ -158,3 +157,14 @@ def coletar(chave: str, x_admin_token: str = Header(default="")):
         raise HTTPException(404, "Coletor inexistente")
     threading.Thread(target=c.COLETORES[chave], daemon=True).start()
     return {"iniciado": chave}
+
+
+# ---- Serve o frontend compilado em http://localhost:8000 ----
+_DIST = next((p for p in (Path("/srv/static"), Path(__file__).resolve().parents[2] / "frontend" / "dist") if p.exists()), None)
+if _DIST:
+    app.mount("/assets", StaticFiles(directory=_DIST / "assets"), name="assets")
+
+    @app.get("/{caminho:path}", include_in_schema=False)
+    def site(caminho: str):
+        arq = _DIST / caminho
+        return FileResponse(arq if caminho and arq.is_file() else _DIST / "index.html")

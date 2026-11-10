@@ -2,10 +2,7 @@
 import csv, io, json, os, tempfile, unicodedata, zipfile
 from datetime import date, timedelta
 import httpx
-try:
-    from . import db
-except ImportError:
-    import db
+from . import db
 
 H = {"User-Agent": "biomas-monitor/1.0 (projeto academico)"}
 # CONFIRME este endereço no site do IBGE antes de usar (ou defina IBGE_BIOMAS_URL).

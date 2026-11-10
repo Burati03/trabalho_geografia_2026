@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Filtros, R, useApi } from "../api";
-import MapView from "../MapView";
-import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "../ui";
+import { Filtros, R, useApi } from "./api";
+import MapView from "./MapView";
+import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "./ui";
 
 export function BiomasLista() {
   const b = useApi<R[]>("biomas");
@@ -49,17 +49,17 @@ export function BiomaDetalhe() {
         <div className="grade">
           <section className="painel largo"><h3>Alertas por semana</h3>
             <Estado erro={ser.erro} carregando={ser.carregando} vazio={ser.data?.length === 0 && "Sem alertas neste bioma no período."}>
-              <ResponsiveContainer height={240}><LineChart data={ser.data!}><CartesianGrid stroke="#E3EAE4" /><XAxis dataKey="periodo" fontSize={12} /><YAxis fontSize={12} allowDecimals={false} /><Tooltip /><Legend formatter={(k) => TIPOS[k] || k} />
+              <ResponsiveContainer height={240}><LineChart data={ser.data || []}><CartesianGrid stroke="#E3EAE4" /><XAxis dataKey="periodo" fontSize={12} /><YAxis fontSize={12} allowDecimals={false} /><Tooltip /><Legend formatter={(k) => TIPOS[k] || k} />
                 {Object.keys(TIPOS).map((k) => <Line key={k} dataKey={k} stroke={COR_TIPO[k]} strokeWidth={2} dot={false} />)}</LineChart></ResponsiveContainer>
             </Estado></section>
           <section className="painel"><h3>Histórico anual de desmatamento (ha)</h3>
             <Estado vazio={b.historico.length === 0 && "Série anual ainda não carregada: depende da integração com PRODES/MapBiomas."}>
-              <ResponsiveContainer height={240}><BarChart data={b.historico.map((h: R) => ({ ...h, area_desmatada: Number(h.area_desmatada), area_queimada: Number(h.area_queimada) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="ano" fontSize={12} /><YAxis fontSize={12} /><Tooltip /><Legend />
+              <ResponsiveContainer height={240}><BarChart data={(b.historico || []).map((h: R) => ({ ...h, area_desmatada: Number(h.area_desmatada), area_queimada: Number(h.area_queimada) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="ano" fontSize={12} /><YAxis fontSize={12} /><Tooltip /><Legend />
                 <Bar dataKey="area_desmatada" name="Desmatada" fill="#DC4545" /><Bar dataKey="area_queimada" name="Queimada" fill="#E99A32" /></BarChart></ResponsiveContainer>
             </Estado></section>
           <section className="painel"><h3>Impacto por tipo (ha)</h3>
             <Estado vazio={tp.data?.length === 0 && "Sem dados no período."}>
-              <ResponsiveContainer height={240}><BarChart data={tp.data!.map((t) => ({ nome: TIPOS[t.tipo], tipo: t.tipo, area: Number(t.area) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="nome" fontSize={12} /><YAxis fontSize={12} /><Tooltip />
+              <ResponsiveContainer height={240}><BarChart data={(tp.data || []).map((t) => ({ nome: TIPOS[t.tipo], tipo: t.tipo, area: Number(t.area) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="nome" fontSize={12} /><YAxis fontSize={12} /><Tooltip />
                 <Bar dataKey="area" name="Hectares">{tp.data?.map((t) => <Cell key={t.tipo} fill={COR_TIPO[t.tipo]} />)}</Bar></BarChart></ResponsiveContainer>
             </Estado></section>
         </div>

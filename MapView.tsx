@@ -19,8 +19,8 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   useEffect(() => {
     const m = new maplibregl.Map({
       container: el.current!, center: [-54, -14], zoom: 3.4,
-      style: { version: 8, sources: { osm: { type: "raster", tileSize: 256, attribution: "© OpenStreetMap", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"] } },
-        layers: [{ id: "osm", type: "raster", source: "osm", paint: { "raster-saturation": -0.75, "raster-opacity": 0.5 } }] },
+      style: { version: 8, sources: { base: { type: "raster", tileSize: 256, attribution: "© OpenStreetMap contributors © CARTO", tiles: ["https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"] } },
+        layers: [{ id: "base", type: "raster", source: "base", paint: { "raster-saturation": -0.75, "raster-opacity": 0.5 } }] },
     });
     mapa.current = m;
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -80,7 +80,7 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   useEffect(() => {
     const m = mapa.current; if (!ok || !m) return;
     const vis = (id: string, on: boolean) => m.setLayoutProperty(id, "visibility", on ? "visible" : "none");
-    vis("biomas-fill", cam.biomas); vis("biomas-line", cam.biomas); vis("pontos", cam.pontos); vis("calor", cam.calor); vis("osm", cam.base);
+    vis("biomas-fill", cam.biomas); vis("biomas-line", cam.biomas); vis("pontos", cam.pontos); vis("calor", cam.calor); vis("base", cam.base);
   }, [ok, cam]);
 
   return (

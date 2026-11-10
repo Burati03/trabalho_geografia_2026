@@ -1,14 +1,15 @@
-# Biomas Monitor
+# Renova Terra Monitoramento
 
 Aplicativo web de monitoramento ambiental dos biomas brasileiros: FastAPI + PostgreSQL/PostGIS no backend e React + TypeScript + MapLibre + Recharts no frontend.
 
-## Como rodar
+## Como rodar (tudo em http://localhost:8000)
 
 ```bash
-cp .env.example .env            # preencha FIRMS_MAP_KEY (gratuita) e ADMIN_TOKEN
-docker compose up --build       # banco + API em http://localhost:8000 (docs em /docs)
-cd frontend && npm install && npm run dev   # http://localhost:5173
+cp env.example .env             # preencha FIRMS_MAP_KEY (gratuita) e ADMIN_TOKEN
+docker compose up --build       # compila o site, sobe o banco e a API
 ```
+
+Abra **http://localhost:8000** (documentação da API em `/docs`). Para desenvolver o frontend separado, execute `npm install && npm run dev` na raiz do projeto (porta 5173).
 
 Na primeira execução a API cria as tabelas, tenta baixar os limites dos biomas (IBGE) e coletar FIRMS e DETER. O resultado de cada coleta aparece em **Fontes e metodologia**. Para forçar uma coleta:
 
@@ -43,5 +44,4 @@ Com `SEED_DEMO=1` são criados 280 alertas sintéticos (`demo = true`, fonte "DA
 
 ## Estrutura
 
-`backend/app`: `schema.sql` (tabelas, FKs, índices GIST), `collectors.py`, `demo.py`, `main.py` (API REST).
-`frontend/src`: `pages/` (Dashboard, Mapa, Biomas, Alertas, Fontes), `MapView.tsx`, `ui.tsx`, `api.ts`.
+Na raiz: `schema.sql` (tabelas, FKs, índices GIST), `collectors.py`, `demo.py` e `main.py` (API REST); os componentes React e a configuração do Vite/TypeScript também ficam na raiz.

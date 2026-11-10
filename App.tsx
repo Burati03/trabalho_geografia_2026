@@ -1,11 +1,11 @@
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { useApi } from "./api";
 import { BIOMA_COR } from "./ui";
-import Dashboard from "./pages/Dashboard";
-import Mapa from "./pages/Mapa";
-import { BiomasLista, BiomaDetalhe } from "./pages/Biomas";
-import Alertas from "./pages/Alertas";
-import Fontes from "./pages/Fontes";
+import Dashboard from "./Dashboard";
+import Mapa from "./Mapa";
+import { BiomasLista, BiomaDetalhe } from "./Biomas";
+import Alertas from "./Alertas";
+import Fontes from "./Fontes";
 
 const NAV = [["/", "Visão geral"], ["/mapa", "Mapa"], ["/biomas", "Biomas"], ["/alertas", "Alertas"], ["/fontes", "Fontes e metodologia"]];
 
@@ -16,7 +16,7 @@ export default function App() {
       <div className="shell">
         <aside>
           <div className="strata" aria-hidden>{Object.values(BIOMA_COR).map((c) => <i key={c} style={{ background: c }} />)}</div>
-          <h1>Biomas<br />Monitor</h1>
+          <img className="brand-logo" src="/logo-renova-terra.png" alt="Renova Terra Monitoramento" />
           <nav aria-label="Principal">{NAV.map(([to, n]) => <NavLink key={to} to={to} end={to === "/"}>{n}</NavLink>)}</nav>
           <p className="rodape">Dados de fontes oficiais, com a data de cada atualização. Alertas preliminares não são dados consolidados.</p>
         </aside>
