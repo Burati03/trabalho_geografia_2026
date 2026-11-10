@@ -110,12 +110,12 @@ def deter():
 
 
 # ---------- IBGE: limites dos biomas ----------
-NOMES = {"amazonia": "amazonia", "caatinga": "caatinga", "cerrado": "cerrado", "mata atlantica": "mata-atlantica",
-         "pampa": "pampa", "pantanal": "pantanal", "sistema costeiro-marinho": "costeiro-marinho"}
+NOMES = {"amazonia": "amazonia", "caatinga": "caatinga", "cerrado": "cerrado", "mataatlantica": "mata-atlantica",
+         "pampa": "pampa", "pantanal": "pantanal", "sistemacosteiromarinho": "costeiro-marinho"}
 
 
 def _norm(s):
-    return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower().strip()
+    return "".join(ch for ch in unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower().strip() if ch.isalnum())
 
 
 def ibge_biomas_se_preciso():
@@ -133,7 +133,7 @@ def ibge_biomas():
             zipfile.ZipFile(io.BytesIO(r.content)).extractall(d)
             shp = next(os.path.join(d, n) for n in os.listdir(d) if n.lower().endswith(".shp"))
             n = 0
-            for sr in shapefile.Reader(shp, encoding="latin-1").shapeRecords():
+            for sr in shapefile.Reader(shp, encoding="utf-8").shapeRecords():
                 slug = next((NOMES[_norm(v)] for v in sr.record.as_dict().values()
                              if isinstance(v, str) and _norm(v) in NOMES), None)
                 if not slug:

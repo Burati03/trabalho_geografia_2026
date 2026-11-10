@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
-from . import collectors as c, db, demo
+from . import collectors as c, db
 
 BASE = "FROM alertas a LEFT JOIN biomas b ON b.id=a.bioma_id JOIN fontes_dados f ON f.id=a.fonte_id"
 
@@ -15,13 +15,12 @@ BASE = "FROM alertas a LEFT JOIN biomas b ON b.id=a.bioma_id JOIN fontes_dados f
 @asynccontextmanager
 async def lifespan(app):
     db.init()
-    if os.environ.get("SEED_DEMO") == "1":
-        demo.semear()
     sch = BackgroundScheduler(timezone="UTC")
     sch.add_job(c.firms, "interval", hours=3)      # FIRMS NRT atualiza algumas vezes ao dia
     sch.add_job(c.deter, "interval", hours=24)     # DETER: atualização diária
     for fn in (c.ibge_biomas_se_preciso, c.firms, c.deter):
         sch.add_job(fn)                            # uma execução imediata
+    c.atribuir_biomas()
     sch.start()
     yield
     sch.shutdown(wait=False)

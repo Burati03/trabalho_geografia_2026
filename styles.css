@@ -1,7 +1,7 @@
 :root{--verde-esc:#123D2A;--verde:#23834B;--verde-cl:#A5D6A7;--azul:#1677A8;--fundo:#F4F7F4;--ink:#17261E;--muda:#5B6B61;--linha:#D5DED6;--crit:#DC4545;--aten:#E99A32}
 *{box-sizing:border-box}
-body{margin:0;background:var(--fundo);color:var(--ink);font:15px/1.5 "Public Sans",system-ui,sans-serif}
-h1,h2,h3{font-family:"Bricolage Grotesque","Public Sans",sans-serif;margin:0;line-height:1.15}
+body{margin:0;background:var(--fundo);color:var(--ink);font:15px/1.5 "Montserrat","Public Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Montserrat","Bricolage Grotesque","Public Sans",sans-serif;margin:0;line-height:1.15}
 a{color:var(--azul)}
 :focus-visible{outline:3px solid var(--aten);outline-offset:2px}
 .shell{display:grid;grid-template-columns:248px 1fr;min-height:100vh}

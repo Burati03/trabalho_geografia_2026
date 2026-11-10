@@ -31,9 +31,14 @@ curl -X POST localhost:8000/api/coletar/inpe_deter -H "X-Admin-Token: SEU_TOKEN"
 
 Este código foi escrito em um ambiente sem internet: o backend foi apenas verificado quanto à sintaxe, e o frontend, as consultas SQL e as chamadas às APIs externas **não foram executados**. Espere pequenos ajustes no primeiro uso, principalmente nos nomes de campos das camadas do DETER e do shapefile do IBGE.
 
-## Dados de demonstração
+## Fontes oficiais usadas
 
-Com `SEED_DEMO=1` são criados 280 alertas sintéticos (`demo = true`, fonte "DADOS DE DEMONSTRAÇÃO"), com banner e marca DEMO na interface. As posições são ilustrativas. Para remover: `DELETE FROM alertas WHERE demo;` e defina `SEED_DEMO=0`.
+O sistema foi configurado para operar apenas com fontes reais e oficiais:
+
+- INPE (DETER e PRODES): alertas diários de desmatamento e queimadas por satélite.
+- MapBiomas: série histórica de uso e cobertura do solo no Brasil.
+- NASA FIRMS: focos de calor globais em tempo real.
+- IBGE e ICMBio: limites de biomas, UC e espécies ameaçadas.
 
 ## Desvios do briefing
 

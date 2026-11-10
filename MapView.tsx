@@ -6,6 +6,11 @@ import { BIOMA_COR, TIPOS, dia, nf } from "./ui";
 
 const esc = (s: any) => String(s ?? "—").replace(/[&<>"']/g, (c) => "&#" + c.charCodeAt(0) + ";");
 const VAZIO = { type: "FeatureCollection", features: [] } as any;
+const CARTO_STYLE = (() => {
+  const key = ((import.meta as any).env && (import.meta as any).env.VITE_CARTO_MAP_KEY) || "";
+  const base = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+  return key ? `${base}?key=${encodeURIComponent(key)}` : base;
+})();
 
 export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altura?: number | string; onBioma?: (s: string) => void }) {
   const el = useRef<HTMLDivElement>(null);
@@ -19,8 +24,7 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   useEffect(() => {
     const m = new maplibregl.Map({
       container: el.current!, center: [-54, -14], zoom: 3.4,
-      style: { version: 8, sources: { base: { type: "raster", tileSize: 256, attribution: "© OpenStreetMap contributors © CARTO", tiles: ["https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"] } },
-        layers: [{ id: "base", type: "raster", source: "base", paint: { "raster-saturation": -0.75, "raster-opacity": 0.5 } }] },
+      style: CARTO_STYLE,
     });
     mapa.current = m;
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");

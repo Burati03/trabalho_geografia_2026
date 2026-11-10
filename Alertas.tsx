@@ -25,7 +25,7 @@ export default function Alertas() {
           <div className="tabela"><table>
             <thead><tr><th>ID</th><th>Bioma</th><th>Impacto</th><th>Lat, Lon</th><th>Área (ha)</th><th>Data</th><th>Fonte</th><th>UF</th><th>Prioridade</th><th>Situação</th></tr></thead>
             <tbody>{d.data?.itens.map((a: R) => (
-              <tr key={a.id}><td title={a.id_externo}>{a.demo ? "DEMO " : ""}{a.id}</td><td>{a.bioma_nome || "—"}</td><td>{TIPOS[a.tipo_impacto]}</td>
+              <tr key={a.id}><td title={a.id_externo}>{a.id}</td><td>{a.bioma_nome || "—"}</td><td>{TIPOS[a.tipo_impacto]}</td>
                 <td>{a.latitude.toFixed(4)}, {a.longitude.toFixed(4)}</td><td>{nf(a.area_afetada, 1)}</td><td>{dia(a.data_ocorrencia)}</td>
                 <td>{a.fonte}</td><td>{a.uf || "—"}</td><td><span className={"chip " + a.nivel_prioridade}>{a.nivel_prioridade}</span></td><td>{a.status}</td></tr>))}</tbody>
           </table></div>

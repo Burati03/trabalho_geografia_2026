@@ -21,7 +21,6 @@ export default function App() {
           <p className="rodape">Dados de fontes oficiais, com a data de cada atualização. Alertas preliminares não são dados consolidados.</p>
         </aside>
         <main>
-          {ind.data?.tem_demo && <p className="demo" role="status"><strong>Dados de demonstração presentes.</strong> Registros marcados como DEMO são sintéticos e não representam ocorrências reais.</p>}
           <Routes>
             <Route path="/" element={<Dashboard />} /><Route path="/mapa" element={<Mapa />} />
             <Route path="/biomas" element={<BiomasLista />} /><Route path="/biomas/:slug" element={<BiomaDetalhe />} />

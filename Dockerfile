@@ -1,5 +1,7 @@
 FROM node:20-slim AS web
 WORKDIR /web
+ARG VITE_CARTO_MAP_KEY
+ENV VITE_CARTO_MAP_KEY=${VITE_CARTO_MAP_KEY}
 COPY package.json ./
 RUN npm install
 COPY *.tsx *.ts *.css index.html tsconfig.json vite.config.ts ./

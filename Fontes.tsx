@@ -1,7 +1,7 @@
 import { R, useApi } from "./api";
 import { Estado, dh } from "./ui";
 
-const ROTULO: Record<string, string> = { ativa: "Ativa", erro: "Com erro", nao_configurada: "Sem chave", planejada: "Planejada", pendente: "Aguardando coleta", demo: "Demonstração" };
+const ROTULO: Record<string, string> = { ativa: "Ativa", erro: "Com erro", nao_configurada: "Sem chave", planejada: "Planejada", pendente: "Aguardando coleta" };
 
 export default function Fontes() {
   const d = useApi<R[]>("fontes");

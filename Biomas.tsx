@@ -15,7 +15,7 @@ export function BiomasLista() {
           <Link key={x.slug} to={`/biomas/${x.slug}`} className="bioma" style={{ ["--cor" as any]: BIOMA_COR[x.slug] }}>
             <h3>{x.nome}</h3><p>{x.descricao}</p>
             <dl><div><dt>Área</dt><dd>{x.area_total ? nf(x.area_total / 1e6, 1) + " mi ha" : "—"}</dd></div>
-              <div><dt>Alertas</dt><dd>{nf(x.alertas)}</dd></div></dl>
+              <div><dt>Alertas</dt><dd>{Number(x.alertas || 0) === 0 ? "Sem alertas" : nf(x.alertas)}</dd></div></dl>
           </Link>))}</div>
       </Estado>
     </>

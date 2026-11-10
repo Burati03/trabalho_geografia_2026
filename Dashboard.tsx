@@ -35,9 +35,10 @@ export default function Dashboard() {
               {Object.keys(TIPOS).map((k) => <Line key={k} type="monotone" dataKey={k} stroke={COR_TIPO[k]} strokeWidth={2} dot={false} />)}</LineChart></ResponsiveContainer>
           </Estado></section>
         <section className="painel"><h3>Comparação entre biomas</h3>
-          <Estado erro={bio.erro} carregando={bio.carregando}>
-            <ResponsiveContainer height={260}><BarChart data={bio.data || []} layout="vertical" margin={{ left: 20 }}><CartesianGrid stroke="#E3EAE4" horizontal={false} /><XAxis type="number" fontSize={12} allowDecimals={false} /><YAxis type="category" dataKey="nome" width={130} fontSize={12} /><Tooltip />
-              <Bar dataKey="alertas" name="Alertas">{bio.data?.map((b) => <Cell key={b.slug} fill={BIOMA_COR[b.slug]} />)}</Bar></BarChart></ResponsiveContainer>
+          <Estado erro={bio.erro} carregando={bio.carregando} vazio={bio.data?.length === 0 && "Nenhum bioma com alertas no período."}>
+            <ResponsiveContainer height={260}><BarChart data={(bio.data || []).map((b) => ({ ...b, alertas: Number(b.alertas || 0) }))} layout="vertical" margin={{ left: 20 }}><CartesianGrid stroke="#E3EAE4" horizontal={false} /><XAxis type="number" fontSize={12} allowDecimals={false} /><YAxis type="category" dataKey="nome" width={130} fontSize={12} /><Tooltip />
+              <Bar dataKey="alertas" name="Alertas">{(bio.data || []).map((b) => <Cell key={b.slug} fill={BIOMA_COR[b.slug]} />)}</Bar></BarChart></ResponsiveContainer>
+            <p className="nota">Biomas sem alertas no filtro aparecem com zero, sem esconder a ausência de dados.</p>
           </Estado></section>
         <section className="painel"><h3>Área afetada por tipo de impacto (ha)</h3>
           <Estado erro={tipo.erro} carregando={tipo.carregando} vazio={tipo.data?.length === 0 && "Sem dados no período."}>

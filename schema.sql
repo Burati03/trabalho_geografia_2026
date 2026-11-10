@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS fontes_dados (
   tipo_dados TEXT,
   ultima_atualizacao TIMESTAMPTZ,
   status_integracao TEXT NOT NULL DEFAULT 'pendente'
-    CHECK (status_integracao IN ('pendente','ativa','erro','nao_configurada','planejada','demo')),
+    CHECK (status_integracao IN ('pendente','ativa','erro','nao_configurada','planejada')),
   mensagem TEXT
 );
 
@@ -81,8 +81,7 @@ INSERT INTO fontes_dados (chave, nome_instituicao, descricao, endereco_api, link
 ('nasa_firms','NASA FIRMS','Focos de calor por satélite (VIIRS S-NPP, tempo quase real).','https://firms.modaps.eosdis.nasa.gov/api/area/','https://firms.modaps.eosdis.nasa.gov/','Focos de calor','pendente'),
 ('ibge_biomas','IBGE — Biomas','Limites territoriais dos biomas.',NULL,'https://www.ibge.gov.br/','Geometria dos biomas','pendente'),
 ('mapbiomas','MapBiomas','Uso e cobertura do solo, histórico de vegetação.',NULL,'https://brasil.mapbiomas.org/','Cobertura do solo anual','planejada'),
-('icmbio','ICMBio','Unidades de Conservação, áreas protegidas e espécies ameaçadas.',NULL,'https://www.gov.br/icmbio/','Áreas protegidas','planejada'),
-('demo','DADOS DE DEMONSTRAÇÃO','Registros sintéticos, apenas para testar a interface. Não representam ocorrências reais.',NULL,NULL,'Demonstração','demo')
+('icmbio','ICMBio','Unidades de Conservação, áreas protegidas e espécies ameaçadas.',NULL,'https://www.gov.br/icmbio/','Áreas protegidas','planejada')
 ON CONFLICT (chave) DO NOTHING;
 
 INSERT INTO biomas (slug, nome, descricao, clima, ameacas) VALUES
