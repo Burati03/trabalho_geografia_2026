@@ -2,7 +2,10 @@
 import csv, io, json, os, tempfile, unicodedata, zipfile
 from datetime import date, timedelta
 import httpx
-from . import db
+if __package__:
+    from . import db
+else:
+    import db
 
 H = {"User-Agent": "biomas-monitor/1.0 (projeto academico)"}
 # CONFIRME este endereço no site do IBGE antes de usar (ou defina IBGE_BIOMAS_URL).

@@ -1,10 +1,10 @@
 services:
   - type: web
     name: renova-terra
-    runtime: docker
+    runtime: python
     plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/indicadores
     envVars:
       - key: UV_LINK_MODE

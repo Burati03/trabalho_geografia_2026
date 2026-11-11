@@ -7,7 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
-from . import collectors as c, db
+if __package__:
+    from . import collectors as c, db
+else:
+    import collectors as c
+    import db
 
 BASE = "FROM alertas a LEFT JOIN biomas b ON b.id=a.bioma_id JOIN fontes_dados f ON f.id=a.fonte_id"
 
