@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://SEU-BACKEND-URL/api/:path*"
+      "destination": "https://trabalho-geografia-2026.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
