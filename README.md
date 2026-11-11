@@ -11,6 +11,10 @@ docker compose up --build       # compila o site, sobe o banco e a API
 
 Abra **http://localhost:8000** (documentação da API em `/docs`). Para desenvolver o frontend separado, execute `npm install && npm run dev` na raiz do projeto (porta 5173).
 
+## Deploy no Render
+
+Crie um Blueprint no Render apontando para este repositório e use o arquivo `render.yaml`. Ele configura o serviço web como Docker (não como Python nativo), cria o PostgreSQL e publica frontend e API no mesmo endereço. Defina `FIRMS_MAP_KEY` e `VITE_CARTO_MAP_KEY` quando o Render solicitar os valores secretos; `DATABASE_URL` e `ADMIN_TOKEN` são configurados pelo Blueprint. O serviço de banco gratuito pode ter limitações de retenção e disponibilidade, conforme o plano atual do Render.
+
 Na primeira execução a API cria as tabelas, tenta baixar os limites dos biomas (IBGE) e coletar FIRMS e DETER. O resultado de cada coleta aparece em **Fontes e metodologia**. Para forçar uma coleta:
 
 ```bash

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: renova-terra
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/indicadores
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: renova-terra-db
+          property: connectionString
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: FIRMS_MAP_KEY
+        sync: false
+      - key: VITE_CARTO_MAP_KEY
+        sync: false
+      - key: SEED_DEMO
+        value: "0"
+
+databases:
+  - name: renova-terra-db
+    plan: free
+    databaseName: renova_terra
+    user: renova_terra
