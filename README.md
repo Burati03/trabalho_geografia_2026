@@ -10,6 +10,8 @@ docker compose up --build       # compila o site, sobe o banco e a API
 ```
 
 Abra **http://localhost:8000** (documentação da API em `/docs`). Para desenvolver o frontend separado, execute `npm install && npm run dev` na raiz do projeto (porta 5173).
+O padrão `SEED_DEMO=0` remove registros sintéticos e mantém apenas alertas reais. A NASA FIRMS fornece focos de calor para o Brasil; o DETER cobre Amazônia e Cerrado. Portanto, outros biomas só terão registros reais quando houver focos FIRMS no período. Para testar a interface, `SEED_DEMO=1` inclui amostras sintéticas nos seis biomas terrestres, sempre identificadas como demonstração.
+Totais recebidos de forma agregada por bioma e estado aparecem separadamente dos alertas reais na visão geral, na lista e no detalhe dos biomas, no mapa e na central de alertas. Como a fonte e o período não foram informados, não são verificáveis, não respondem aos filtros e não geram pontos de alerta; no mapa, somente os totais por bioma podem colorir os polígonos oficiais.
 
 ## Deploy no Render
 
@@ -48,6 +50,7 @@ O sistema foi configurado para operar apenas com fontes reais e oficiais:
 
 - Estilos em CSS próprio no lugar de Tailwind, para manter a identidade visual sem depender de utilitários.
 - Percentual de vegetação remanescente, histórico anual, Unidades de Conservação e espécies ameaçadas (RF09, RF10) aguardam as integrações MapBiomas/PRODES/ICMBio.
+- O Sistema Costeiro-Marinho é exibido como unidade ecológica complementar, não como um dos seis biomas terrestres do IBGE; como não há polígono oficial carregado para ele, os dados de demonstração espacial são gerados apenas nos seis biomas com geometria.
 - Exportação em CSV está pronta; PDF não foi implementado (RF14 parcial).
 - UF só existe para alertas do DETER; focos do FIRMS não trazem UF.
 

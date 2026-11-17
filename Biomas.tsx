@@ -4,6 +4,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Responsive
 import { Filtros, R, useApi } from "./api";
 import MapView from "./MapView";
 import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "./ui";
+import { ROTULO_TOTAIS_INFORMADOS, totalInformadoBioma } from "./totaisInformados";
 
 export function BiomasLista() {
   const b = useApi<R[]>("biomas");
@@ -15,8 +16,10 @@ export function BiomasLista() {
           <Link key={x.slug} to={`/biomas/${x.slug}`} className="bioma" style={{ ["--cor" as any]: BIOMA_COR[x.slug] }}>
             <h3>{x.nome}</h3><p>{x.descricao}</p>
             <dl><div><dt>Área</dt><dd>{x.area_total ? nf(x.area_total / 1e6, 1) + " mi ha" : "—"}</dd></div>
-              <div><dt>Alertas</dt><dd>{Number(x.alertas || 0) === 0 ? "Sem alertas" : nf(x.alertas)}</dd></div></dl>
+              <div><dt>Alertas reais</dt><dd>{Number(x.alertas || 0) === 0 ? "Sem alertas" : nf(x.alertas)}</dd></div>
+              <div><dt>Total agregado informado</dt><dd>{nf(totalInformadoBioma(x.slug))}</dd></div></dl>
           </Link>))}</div>
+        <p className="nota">{ROTULO_TOTAIS_INFORMADOS} Os totais agregados não são alertas individuais nem respondem aos filtros.</p>
       </Estado>
     </>
   );
@@ -31,6 +34,7 @@ export function BiomaDetalhe() {
   const b = d.data;
   const total = tp.data?.reduce((s, x) => s + x.total, 0);
   const area = tp.data?.reduce((s, x) => s + Number(x.area), 0);
+  const totalInformado = totalInformadoBioma(slug);
   return (
     <Estado erro={d.erro} carregando={d.carregando}>
       {b && <>
@@ -41,9 +45,11 @@ export function BiomaDetalhe() {
           <div><span>Área territorial</span><strong>{b.area_total ? nf(b.area_total / 1e6, 1) + " mi ha" : "Aguardando IBGE"}</strong></div>
           <div><span>Vegetação nativa remanescente</span><strong className={b.percentual_remanescente == null ? "pendente" : ""}>{b.percentual_remanescente == null ? "Aguardando MapBiomas" : nf(b.percentual_remanescente, 1) + "%"}</strong></div>
           <div><span>Clima predominante</span><strong className="texto">{b.clima}</strong></div>
-          <div><span>Alertas no período</span><strong>{nf(total)}</strong></div>
+          <div><span>Alertas reais no período</span><strong>{nf(total)}</strong></div>
+          <div><span>Total agregado informado</span><strong>{nf(totalInformado)}</strong></div>
           <div><span>Área afetada (ha)</span><strong>{nf(area, 1)}</strong></div>
         </section>
+        {totalInformado != null && <p className="nota">{ROTULO_TOTAIS_INFORMADOS} Este número não é filtrado pelo período escolhido.</p>}
         <p className="fonte">Principais ameaças: {b.ameacas?.join("; ")}. Limites atualizados em {dh(b.data_atualizacao)}.</p>
         <FiltroBar v={f} onChange={setF} ocultar={["bioma", "uf", "prioridade", "tipo"]} />
         <div className="grade">

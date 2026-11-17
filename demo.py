@@ -1,29 +1,51 @@
-"""Alertas SINTÉTICOS (demo=true, fonte 'demo') para testar a interface. Posições ilustrativas, não são ocorrências reais."""
+"""Alertas sintéticos para testar a interface; pontos ficam dentro dos polígonos oficiais disponíveis."""
 import random
 from datetime import date, timedelta
-from . import db
+if __package__:
+    from . import db
+else:
+    import db
 
-CAIXAS = {"amazonia": (-70, -9, -50, -1), "cerrado": (-52, -18, -45, -8), "pantanal": (-58, -20, -55.5, -16),
-          "mata-atlantica": (-48, -26, -41, -18), "caatinga": (-43, -12, -38, -6), "pampa": (-56, -31, -52, -29),
-          "costeiro-marinho": (-39, -14, -36, -9)}
+BIOMAS_TERRESTRES = {"amazonia", "caatinga", "cerrado", "mata-atlantica", "pampa", "pantanal"}
+
+PONTOS_SQL = """SELECT b.slug, ST_Y(p.geom) latitude, ST_X(p.geom) longitude
+FROM biomas b
+CROSS JOIN LATERAL ST_Dump(ST_GeneratePoints(b.geometria, 40)) AS p
+WHERE b.geometria IS NOT NULL AND b.slug <> 'costeiro-marinho'
+ORDER BY b.slug"""
 SQL = """INSERT INTO alertas (id_externo, bioma_id, latitude, longitude, area_afetada, data_ocorrencia, tipo_impacto,
   descricao, fonte_id, nivel_prioridade, status, demo)
   VALUES (%(id)s, (SELECT id FROM biomas WHERE slug=%(slug)s), %(lat)s, %(lon)s, %(area)s, %(data)s, %(tipo)s,
-  'DADO DE DEMONSTRAÇÃO — não é uma ocorrência real', (SELECT id FROM fontes_dados WHERE chave='demo'),
+  'DADO SINTÉTICO DE DEMONSTRAÇÃO — não é uma ocorrência real', (SELECT id FROM fontes_dados WHERE chave='demo'),
   %(prio)s, 'preliminar', TRUE) ON CONFLICT DO NOTHING"""
 
 
 def semear():
-    if db.one("SELECT 1 AS x FROM alertas WHERE demo LIMIT 1"):
+    if db.one("SELECT 1 AS x FROM alertas WHERE id_externo LIKE 'demo-v2-%' LIMIT 1"):
         return
-    rnd, lote = random.Random(7), []
-    for slug, (x0, y0, x1, y1) in CAIXAS.items():
-        for i in range(40):
-            tipo = rnd.choice(["desmatamento", "queimada", "queimada", "degradacao"])
-            area = None if tipo == "queimada" else round(rnd.uniform(1, 150), 2)
-            prio = "baixa" if area is None else "critica" if area >= 100 else "alta" if area >= 25 else "media" if area >= 5 else "baixa"
-            lote.append({"id": f"demo-{slug}-{i}", "slug": slug, "lat": round(rnd.uniform(y0, y1), 4),
-                         "lon": round(rnd.uniform(x0, x1), 4), "area": area, "tipo": tipo, "prio": prio,
-                         "data": (date.today() - timedelta(days=rnd.randint(0, 89))).isoformat()})
+    pontos = db.rows(PONTOS_SQL)
+    biomas_com_pontos = {p["slug"] for p in pontos}
+    faltantes = sorted(BIOMAS_TERRESTRES - biomas_com_pontos)
+    if faltantes:
+        raise RuntimeError("Sem polígonos oficiais para gerar dados de demonstração: " + ", ".join(faltantes))
+
+    rnd, lote, indices = random.Random(7), [], {}
+    for ponto in pontos:
+        slug = ponto["slug"]
+        i = indices.get(slug, 0)
+        indices[slug] = i + 1
+        tipo = rnd.choice(["desmatamento", "queimada", "queimada", "degradacao"])
+        area = None if tipo == "queimada" else round(rnd.uniform(1, 150), 2)
+        prio = "baixa" if area is None else "critica" if area >= 100 else "alta" if area >= 25 else "media" if area >= 5 else "baixa"
+        lote.append({"id": f"demo-v2-{slug}-{i}", "slug": slug, "lat": ponto["latitude"],
+                     "lon": ponto["longitude"], "area": area, "tipo": tipo, "prio": prio,
+                     "data": (date.today() - timedelta(days=rnd.randint(0, 29))).isoformat()})
     db.many(SQL, lote)
+    db.run("DELETE FROM alertas WHERE demo AND id_externo LIKE 'demo-%' AND id_externo NOT LIKE 'demo-v2-%'")
     db.run("UPDATE fontes_dados SET ultima_atualizacao=now(), mensagem='Registros sintéticos de teste.' WHERE chave='demo'")
+
+
+def limpar():
+    db.run("DELETE FROM alertas WHERE demo")
+    db.run("UPDATE fontes_dados SET ultima_atualizacao=NULL, mensagem='Dados sintéticos removidos; demonstração desativada.' "
+           "WHERE chave='demo'")

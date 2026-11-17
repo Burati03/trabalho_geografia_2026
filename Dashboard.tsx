@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Filtros, R, useApi } from "./api";
 import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "./ui";
+import TotaisInformados from "./TotaisInformados";
 
 export default function Dashboard() {
   const [f, setF] = useState<Filtros>({ de: iso(30) });
@@ -23,18 +24,20 @@ export default function Dashboard() {
       <header className="topo"><h2>Situação ambiental do Brasil</h2><p>Alertas por período, bioma e tipo de impacto.</p></header>
       <FiltroBar v={f} onChange={setF} ocultar={["uf", "prioridade"]} />
       <Estado erro={ind.erro} carregando={ind.carregando}>
+        {d?.tem_demo && <p className="nota">Inclui alertas sintéticos de demonstração; eles não representam ocorrências reais.</p>}
         <section className="boletim" aria-label="Indicadores">
           {itens?.map(([r, v]) => <div key={r}><span>{r}</span><strong className={String(v).startsWith("Aguard") ? "pendente" : ""}>{v}</strong></div>)}
         </section>
         <p className="fonte">Fontes no período: {d?.fontes.length ? d.fontes.map((x: R) => `${x.nome} (atualizada em ${dh(x.ultima_atualizacao)})`).join("; ") : "nenhuma — sem alertas para estes filtros"}.</p>
       </Estado>
       <div className="grade">
+        <TotaisInformados />
         <section className="painel largo"><h3>Alertas por semana</h3>
           <Estado erro={ser.erro} carregando={ser.carregando} vazio={ser.data?.length === 0 && "Sem alertas no período. Rode uma coleta ou ajuste os filtros."}>
             <ResponsiveContainer height={260}><LineChart data={ser.data || []}><CartesianGrid stroke="#E3EAE4" /><XAxis dataKey="periodo" fontSize={12} /><YAxis fontSize={12} allowDecimals={false} /><Tooltip /><Legend formatter={(k) => TIPOS[k] || k} />
               {Object.keys(TIPOS).map((k) => <Line key={k} type="monotone" dataKey={k} stroke={COR_TIPO[k]} strokeWidth={2} dot={false} />)}</LineChart></ResponsiveContainer>
           </Estado></section>
-        <section className="painel"><h3>Comparação entre biomas</h3>
+        <section className="painel"><h3>Alertas reais por bioma</h3>
           <Estado erro={bio.erro} carregando={bio.carregando} vazio={bio.data?.length === 0 && "Nenhum bioma com alertas no período."}>
             <ResponsiveContainer height={260}><BarChart data={(bio.data || []).map((b) => ({ ...b, alertas: Number(b.alertas || 0) }))} layout="vertical" margin={{ left: 20 }}><CartesianGrid stroke="#E3EAE4" horizontal={false} /><XAxis type="number" fontSize={12} allowDecimals={false} /><YAxis type="category" dataKey="nome" width={130} fontSize={12} /><Tooltip />
               <Bar dataKey="alertas" name="Alertas">{(bio.data || []).map((b) => <Cell key={b.slug} fill={BIOMA_COR[b.slug]} />)}</Bar></BarChart></ResponsiveContainer>

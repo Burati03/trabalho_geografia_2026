@@ -122,7 +122,10 @@ def _norm(s):
 
 
 def ibge_biomas_se_preciso():
-    if not db.one("SELECT 1 AS x FROM biomas WHERE geometria IS NOT NULL LIMIT 1"):
+    faltantes = db.one("""SELECT count(*) AS total FROM biomas
+      WHERE slug IN ('amazonia','caatinga','cerrado','mata-atlantica','pampa','pantanal')
+        AND geometria IS NULL""")["total"]
+    if faltantes:
         ibge_biomas()
 
 

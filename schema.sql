@@ -81,15 +81,19 @@ INSERT INTO fontes_dados (chave, nome_instituicao, descricao, endereco_api, link
 ('nasa_firms','NASA FIRMS','Focos de calor por satélite (VIIRS S-NPP, tempo quase real).','https://firms.modaps.eosdis.nasa.gov/api/area/','https://firms.modaps.eosdis.nasa.gov/','Focos de calor','pendente'),
 ('ibge_biomas','IBGE — Biomas','Limites territoriais dos biomas.',NULL,'https://www.ibge.gov.br/','Geometria dos biomas','pendente'),
 ('mapbiomas','MapBiomas','Uso e cobertura do solo, histórico de vegetação.',NULL,'https://brasil.mapbiomas.org/','Cobertura do solo anual','planejada'),
-('icmbio','ICMBio','Unidades de Conservação, áreas protegidas e espécies ameaçadas.',NULL,'https://www.gov.br/icmbio/','Áreas protegidas','planejada')
+('icmbio','ICMBio','Unidades de Conservação, áreas protegidas e espécies ameaçadas.',NULL,'https://www.gov.br/icmbio/','Áreas protegidas','planejada'),
+('demo','Demonstração','Alertas sintéticos para testar a interface; não representam ocorrências reais.',NULL,NULL,'Dados sintéticos de demonstração','planejada')
 ON CONFLICT (chave) DO NOTHING;
 
 INSERT INTO biomas (slug, nome, descricao, clima, ameacas) VALUES
-('amazonia','Amazônia','Maior floresta tropical do mundo, com enorme biodiversidade e papel central na regulação do clima.','Equatorial úmido',ARRAY['Desmatamento','Queimadas','Exploração ilegal de madeira','Perda de vegetação nativa']),
-('pantanal','Pantanal','Planície alagável com ciclos de cheia e seca e grande concentração de fauna.','Tropical com estação seca e cheias sazonais',ARRAY['Queimadas','Desmatamento','Degradação ambiental','Alteração da cobertura vegetal']),
-('mata-atlantica','Mata Atlântica','Bioma muito fragmentado, que abriga a maior parte da população brasileira.','Tropical úmido a subtropical',ARRAY['Desmatamento','Fragmentação florestal','Expansão urbana','Perda de biodiversidade']),
-('cerrado','Cerrado','Savana com alta diversidade e nascentes de grandes bacias hidrográficas.','Tropical sazonal',ARRAY['Expansão agropecuária','Queimadas','Desmatamento','Conversão da vegetação nativa']),
-('caatinga','Caatinga','Bioma exclusivamente brasileiro, típico do semiárido nordestino.','Semiárido',ARRAY['Desertificação','Desmatamento ilegal para lenha','Perda de vegetação nativa']),
-('pampa','Pampa','Campos nativos do sul do país, ricos em gramíneas e fauna própria.','Subtropical',ARRAY['Conversão de campos para monocultura (soja, eucalipto)','Perda de campos nativos']),
-('costeiro-marinho','Sistema Costeiro-Marinho','Faixa litorânea com manguezais, restingas, recifes e estuários.','Variável ao longo do litoral',ARRAY['Branqueamento de corais','Destruição de manguezais','Expansão imobiliária','Carcinicultura','Resíduos'])
-ON CONFLICT (slug) DO NOTHING;
+('amazonia','Amazônia','Maior bioma brasileiro, formado principalmente por florestas tropicais e uma extensa rede de rios; abriga grande diversidade de espécies.','Equatorial quente e úmido, com variações regionais',ARRAY['Conversão da vegetação nativa','Queimadas','Garimpo e exploração madeireira ilegais','Fragmentação de habitats']),
+('pantanal','Pantanal','Planície sazonalmente inundável cuja paisagem e fauna são influenciadas pelo pulso anual de cheias e vazantes.','Tropical continental, com estação chuvosa e estação seca',ARRAY['Incêndios florestais','Alteração do regime de cheias','Conversão de habitats','Pressões agropecuárias na planície e nas cabeceiras']),
+('mata-atlantica','Mata Atlântica','Conjunto diverso de formações florestais e ecossistemas associados, com alto endemismo e forte fragmentação histórica.','Tropical úmido a subtropical, conforme latitude e altitude',ARRAY['Fragmentação e supressão de habitats','Expansão urbana e agropecuária','Incêndios','Poluição de rios e áreas costeiras']),
+('cerrado','Cerrado','Savana tropical com mosaico de campos, savanas e florestas; abriga nascentes de importantes bacias hidrográficas.','Tropical sazonal, com verão chuvoso e inverno seco',ARRAY['Conversão da vegetação nativa para agropecuária','Fragmentação de habitats','Incêndios em frequência ou intensidade inadequadas','Pressão sobre nascentes e recursos hídricos']),
+('caatinga','Caatinga','Bioma exclusivamente brasileiro, com vegetação adaptada à escassez e à irregularidade das chuvas.','Semiárido quente, com chuvas escassas e irregulares',ARRAY['Supressão da vegetação nativa','Extração insustentável de lenha','Sobrepastoreio e degradação do solo','Risco localizado de desertificação']),
+('pampa','Pampa','Bioma de campos naturais no Rio Grande do Sul, com mosaicos de pastagens nativas, áreas úmidas e matas ciliares.','Subtropical, com estações do ano bem definidas',ARRAY['Conversão de campos nativos para lavouras e silvicultura','Fragmentação dos campos','Espécies exóticas invasoras','Degradação de áreas úmidas']),
+('costeiro-marinho','Sistema Costeiro-Marinho','Conjunto de ecossistemas costeiros e marinhos, como manguezais, restingas, estuários e recifes; não é um dos seis biomas terrestres do IBGE.','Varia conforme a latitude e o ecossistema',ARRAY['Perda e degradação de habitats','Ocupação costeira desordenada','Poluição e resíduos','Sobrepesca','Aquecimento e branqueamento de corais'])
+ON CONFLICT (slug) DO UPDATE SET
+  descricao=EXCLUDED.descricao,
+  clima=EXCLUDED.clima,
+  ameacas=EXCLUDED.ameacas;

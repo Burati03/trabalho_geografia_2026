@@ -37,6 +37,11 @@ button{cursor:pointer}button:disabled{opacity:.45;cursor:default}
 .painel.largo{grid-column:1/-1}
 .painel h3{font-size:17px;margin-bottom:12px}
 .nota{font-size:12.5px;color:var(--muda);margin:6px 0 0}
+.totais-informados{grid-column:1/-1;margin-bottom:18px}
+.totais-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:12px}
+.totais-grade .tabela{max-height:360px;overflow:auto;margin:0}
+.totais-grade td:last-child,.totais-grade th:last-child{text-align:right}
+.mapa-legenda{position:absolute;z-index:2;right:12px;top:12px;max-width:250px;background:#fff;border:1px solid var(--linha);padding:8px 12px;font-size:12px}
 .sub{margin:28px 0 12px;font-size:20px}
 .estado{padding:16px;color:var(--muda);margin:0}.estado.erro{color:var(--crit)}
 .biomas{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
@@ -44,6 +49,7 @@ button{cursor:pointer}button:disabled{opacity:.45;cursor:default}
 .bioma:hover{transform:translateY(-2px)}
 .bioma h3{font-size:20px;margin-bottom:6px}.bioma p{margin:0 0 12px;font-size:14px;color:var(--muda)}
 .bioma dl{display:flex;gap:24px;margin:0}.bioma dt{font-size:12px;color:var(--muda)}.bioma dd{margin:0;font-weight:600}
+.painel h4{font-size:14px;margin:0 0 8px}
 .barra{display:flex;align-items:center;gap:14px;margin:0 0 12px;flex-wrap:wrap}
 .abas{display:flex}.abas button{border-radius:0}.abas button[aria-selected=true]{background:var(--verde-esc);color:#fff;border-color:var(--verde-esc)}
 .botao{margin-left:auto;background:var(--verde);color:#fff;padding:8px 14px;border-radius:3px;text-decoration:none;font-weight:600}
@@ -66,6 +72,6 @@ th{background:#EAF0EB;font-weight:600;white-space:nowrap}
   .shell{grid-template-columns:1fr}
   aside{position:static;height:auto;padding:16px 16px 12px 24px;gap:10px}
   nav{flex-direction:row;overflow-x:auto}nav a{white-space:nowrap}.rodape{display:none}
-  main{padding:20px 16px 48px}.grade{grid-template-columns:1fr}
+  main{padding:20px 16px 48px}.grade,.totais-grade{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

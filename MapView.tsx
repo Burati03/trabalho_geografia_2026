@@ -3,6 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { api, Filtros } from "./api";
 import { BIOMA_COR, TIPOS, dia, nf } from "./ui";
+import { ROTULO_TOTAIS_INFORMADOS, TOTAIS_BIOMAS } from "./totaisInformados";
 
 const esc = (s: any) => String(s ?? "—").replace(/[&<>"']/g, (c) => "&#" + c.charCodeAt(0) + ";");
 const VAZIO = { type: "FeatureCollection", features: [] } as any;
@@ -17,9 +18,11 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   const mapa = useRef<maplibregl.Map | null>(null);
   const coord = useRef<HTMLSpanElement>(null);
   const cb = useRef(onBioma); cb.current = onBioma;
+  const totaisInformadosRef = useRef(false);
   const [ok, setOk] = useState(false);
   const [aviso, setAviso] = useState("");
   const [cam, setCam] = useState({ biomas: true, pontos: true, calor: false, base: true });
+  const [totaisInformados, setTotaisInformados] = useState(false);
 
   useEffect(() => {
     const m = new maplibregl.Map({
@@ -42,7 +45,16 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
         "circle-stroke-width": 0.6, "circle-stroke-color": "#fff" } });
       m.on("click", "biomas-fill", (e) => {
         if (m.queryRenderedFeatures(e.point, { layers: ["pontos"] }).length) return;
-        const s = e.features?.[0]?.properties?.slug; if (s) cb.current?.(s);
+        const feature = e.features?.[0];
+        const s = feature?.properties?.slug;
+        if (s && totaisInformadosRef.current) {
+          new maplibregl.Popup({ maxWidth: "280px" }).setLngLat(e.lngLat).setHTML(
+            `<strong>${esc(feature.properties.nome)}</strong><br>` +
+            `Total agregado informado: ${nf(feature.properties.total_informado)}<br>` +
+            `<small>${esc(ROTULO_TOTAIS_INFORMADOS)} Não representa pontos individuais.</small>`
+          ).addTo(m);
+        }
+        if (s) cb.current?.(s);
       });
       m.on("click", "pontos", (e) => {
         const p: any = e.features![0].properties;
@@ -59,7 +71,11 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
       });
       try {
         const g = await api("biomas.geojson");
-        g.features.forEach((x: any) => (x.properties.cor = BIOMA_COR[x.properties.slug] || "#23834B"));
+        const totais = new Map(TOTAIS_BIOMAS.map((x) => [x.slug, x.total]));
+        g.features.forEach((x: any) => {
+          x.properties.cor = BIOMA_COR[x.properties.slug] || "#23834B";
+          x.properties.total_informado = totais.get(x.properties.slug) ?? 0;
+        });
         (m.getSource("biomas") as maplibregl.GeoJSONSource).setData(g);
       } catch (e: any) { setAviso(e.message); }
       setOk(true);
@@ -82,6 +98,15 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   }, [ok, f.bioma]);
 
   useEffect(() => {
+    totaisInformadosRef.current = totaisInformados;
+    const m = mapa.current; if (!ok || !m) return;
+    m.setPaintProperty("biomas-fill", "fill-color", totaisInformados
+      ? ["interpolate", ["linear"], ["get", "total_informado"],
+          0, "#F1F5F2", 50000, "#B6D7C4", 100000, "#61AA7A", 200000, "#287347", 303510, "#123D2A"]
+      : ["get", "cor"]);
+  }, [ok, totaisInformados]);
+
+  useEffect(() => {
     const m = mapa.current; if (!ok || !m) return;
     const vis = (id: string, on: boolean) => m.setLayoutProperty(id, "visibility", on ? "visible" : "none");
     vis("biomas-fill", cam.biomas); vis("biomas-line", cam.biomas); vis("pontos", cam.pontos); vis("calor", cam.calor); vis("base", cam.base);
@@ -93,7 +118,11 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
       <fieldset className="camadas"><legend>Camadas</legend>
         {([["biomas", "Limites dos biomas"], ["pontos", "Alertas"], ["calor", "Mapa de calor"], ["base", "Mapa base"]] as const).map(([k, n]) => (
           <label key={k}><input type="checkbox" checked={cam[k]} onChange={(e) => setCam({ ...cam, [k]: e.target.checked })} /> {n}</label>))}
+        <label><input type="checkbox" checked={totaisInformados} onChange={(e) => setTotaisInformados(e.target.checked)} /> Totais informados por bioma</label>
       </fieldset>
+      {totaisInformados && <div className="mapa-legenda"><strong>Totais agregados por bioma</strong><br />
+        0 · 50 mil · 100 mil · 200 mil · 303.510<br />
+        <small>{ROTULO_TOTAIS_INFORMADOS} Cores não representam alertas individuais.</small></div>}
       <div className="leitura">Lat, Lon: <span ref={coord}>—</span>{aviso && <> · {aviso}</>}</div>
     </div>
   );

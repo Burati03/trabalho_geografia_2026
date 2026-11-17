@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Filtros, R, qs, useApi } from "./api";
 import MapView from "./MapView";
 import { Estado, FiltroBar, TIPOS, dia, iso, nf } from "./ui";
+import TotaisInformados from "./TotaisInformados";
 
 const POR_PAG = 50;
 export default function Alertas() {
@@ -13,7 +14,8 @@ export default function Alertas() {
   const paginas = Math.max(1, Math.ceil((d.data?.total || 0) / POR_PAG));
   return (
     <>
-      <header className="topo"><h2>Central de alertas</h2><p>Registros georreferenciados com fonte e situação.</p></header>
+      <header className="topo"><h2>Central de alertas</h2><p>Registros georreferenciados com fonte e situação. Os totais agregados abaixo são informativos e não representam alertas individuais.</p></header>
+      <TotaisInformados />
       <FiltroBar v={f} onChange={mudar} />
       <div className="barra">
         <div role="tablist" className="abas">{(["tabela", "mapa"] as const).map((v) => <button key={v} role="tab" aria-selected={vista === v} onClick={() => setVista(v)}>{v === "tabela" ? "Tabela" : "Mapa"}</button>)}</div>

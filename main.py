@@ -8,10 +8,11 @@ from pathlib import Path
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 if __package__:
-    from . import collectors as c, db
+    from . import collectors as c, db, demo
 else:
     import collectors as c
     import db
+    import demo
 
 BASE = "FROM alertas a LEFT JOIN biomas b ON b.id=a.bioma_id JOIN fontes_dados f ON f.id=a.fonte_id"
 
@@ -19,6 +20,11 @@ BASE = "FROM alertas a LEFT JOIN biomas b ON b.id=a.bioma_id JOIN fontes_dados f
 @asynccontextmanager
 async def lifespan(app):
     db.init()
+    if os.environ.get("SEED_DEMO", "0").strip().lower() in {"1", "true", "yes"}:
+        c.ibge_biomas_se_preciso()
+        demo.semear()
+    else:
+        demo.limpar()
     sch = BackgroundScheduler(timezone="UTC")
     sch.add_job(c.firms, "interval", hours=3)      # FIRMS NRT atualiza algumas vezes ao dia
     sch.add_job(c.deter, "interval", hours=24)     # DETER: atualização diária
