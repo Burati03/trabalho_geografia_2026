@@ -7,6 +7,7 @@ import { ROTULO_TOTAIS_INFORMADOS, TOTAIS_BIOMAS } from "./totaisInformados";
 
 const esc = (s: any) => String(s ?? "—").replace(/[&<>"']/g, (c) => "&#" + c.charCodeAt(0) + ";");
 const VAZIO = { type: "FeatureCollection", features: [] } as any;
+const CAMADAS_PROPRIAS = ["biomas-fill", "biomas-line", "calor", "pontos"];
 const CARTO_STYLE = (() => {
   const key = ((import.meta as any).env && (import.meta as any).env.VITE_CARTO_MAP_KEY) || "";
   const base = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
@@ -23,6 +24,7 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   const [aviso, setAviso] = useState("");
   const [cam, setCam] = useState({ biomas: true, pontos: true, calor: false, base: true });
   const [totaisInformados, setTotaisInformados] = useState(false);
+  const [painelAberto, setPainelAberto] = useState(() => typeof window === "undefined" || !window.matchMedia || window.matchMedia("(min-width: 700px)").matches);
 
   useEffect(() => {
     const m = new maplibregl.Map({
@@ -36,9 +38,9 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
     m.on("load", async () => {
       m.addSource("biomas", { type: "geojson", data: VAZIO });
       m.addSource("alertas", { type: "geojson", data: VAZIO });
-      m.addLayer({ id: "biomas-fill", type: "fill", source: "biomas", paint: { "fill-color": ["get", "cor"], "fill-opacity": 0.2 } });
-      m.addLayer({ id: "biomas-line", type: "line", source: "biomas", paint: { "line-color": ["get", "cor"], "line-width": 1.3 } });
-      m.addLayer({ id: "calor", type: "heatmap", source: "alertas", layout: { visibility: "none" }, paint: { "heatmap-radius": 20, "heatmap-intensity": 0.9 } });
+      m.addLayer({ id: "biomas-fill", type: "fill", source: "biomas", paint: { "fill-color": ["get", "cor"], "fill-opacity": 0.26 } });
+      m.addLayer({ id: "biomas-line", type: "line", source: "biomas", paint: { "line-color": ["get", "cor"], "line-width": 1.5 } });
+      m.addLayer({ id: "calor", type: "heatmap", source: "alertas", layout: { visibility: "none" }, paint: { "heatmap-radius": 20, "heatmap-intensity": 0.9, "heatmap-color": ["interpolate", ["linear"], ["heatmap-density"], 0, "rgba(233,154,50,0)", 0.3, "rgba(233,154,50,0.55)", 0.65, "rgba(220,69,69,0.8)", 1, "rgba(120,20,20,0.95)"] } });
       m.addLayer({ id: "pontos", type: "circle", source: "alertas", paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 2.5, 10, 7],
         "circle-color": ["match", ["get", "tipo_impacto"], "desmatamento", "#DC4545", "queimada", "#E99A32", "degradacao", "#8A6D3B", "#1677A8"],
@@ -109,17 +111,21 @@ export default function MapView({ f, altura = 560, onBioma }: { f: Filtros; altu
   useEffect(() => {
     const m = mapa.current; if (!ok || !m) return;
     const vis = (id: string, on: boolean) => m.setLayoutProperty(id, "visibility", on ? "visible" : "none");
-    vis("biomas-fill", cam.biomas); vis("biomas-line", cam.biomas); vis("pontos", cam.pontos); vis("calor", cam.calor); vis("base", cam.base);
+    vis("biomas-fill", cam.biomas); vis("biomas-line", cam.biomas); vis("pontos", cam.pontos); vis("calor", cam.calor);
+    // O mapa base é formado por várias camadas do estilo; as do projeto ficam fora dessa lista.
+    (m.getStyle().layers || []).filter((l) => !CAMADAS_PROPRIAS.includes(l.id))
+      .forEach((l) => m.setLayoutProperty(l.id, "visibility", cam.base ? "visible" : "none"));
   }, [ok, cam]);
 
   return (
     <div className="mapwrap" style={{ height: altura }}>
       <div ref={el} className="mapa" />
-      <fieldset className="camadas"><legend>Camadas</legend>
+      <details className="camadas" open={painelAberto} onToggle={(e) => setPainelAberto((e.currentTarget as HTMLDetailsElement).open)}>
+        <summary>Camadas</summary>
         {([["biomas", "Limites dos biomas"], ["pontos", "Alertas"], ["calor", "Mapa de calor"], ["base", "Mapa base"]] as const).map(([k, n]) => (
           <label key={k}><input type="checkbox" checked={cam[k]} onChange={(e) => setCam({ ...cam, [k]: e.target.checked })} /> {n}</label>))}
         <label><input type="checkbox" checked={totaisInformados} onChange={(e) => setTotaisInformados(e.target.checked)} /> Totais informados por bioma</label>
-      </fieldset>
+      </details>
       {totaisInformados && <div className="mapa-legenda"><strong>Totais agregados por bioma</strong><br />
         0 · 50 mil · 100 mil · 200 mil · 303.510<br />
         <small>{ROTULO_TOTAIS_INFORMADOS} Cores não representam alertas individuais.</small></div>}

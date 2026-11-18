@@ -54,6 +54,19 @@ O sistema foi configurado para operar apenas com fontes reais e oficiais:
 - Exportação em CSV está pronta; PDF não foi implementado (RF14 parcial).
 - UF só existe para alertas do DETER; focos do FIRMS não trazem UF.
 
+## Aprenda sobre os Biomas (área educativa)
+
+Rotas `/aprenda` (lista dos 7 biomas e vídeos) e `/aprenda/:slug` (fauna, flora, características, ameaças, curiosidades, vídeos e atalho para o monitoramento do bioma).
+
+- Conteúdo dos biomas: `biomasInfo.ts`. Texto educativo geral, sem números não verificados; os números de monitoramento continuam vindo da API.
+- Ilustrações: `ilustracoes.tsx` (SVG desenhado no projeto, não fotografias).
+- Vídeos: `videos.ts`. Entram apenas vídeos com ID conferido no YouTube e canal de instituição confiável. Para adicionar, inclua uma linha com `id` (trecho depois de `v=` na URL), título, instituição, bioma e assunto. O player oficial (youtube-nocookie) só carrega quando a pessoa aperta play, e cada vídeo tem o botão "Assistir no YouTube". Hoje o catálogo tem um vídeo (IBGE Explica); os demais biomas mostram um atalho de busca no YouTube até que novos IDs sejam cadastrados.
+- Componentes: `Aprenda.tsx` (páginas) e `VideoCard.tsx` (cartão, explorador por bioma/assunto e destaque do dashboard).
+
+## Redesign (etapa 1)
+
+Nova identidade em verde-escuro, verde-claro, branco e cinza (`styles.css`), menu inferior no celular, faixa de biomas como filtro rápido, indicador principal com mini-gráfico, mapa e alertas recentes no dashboard e comparação entre biomas. Correção: o botão "Mapa base" agora oculta as camadas do mapa base; removida uma chamada à API sem uso em `App.tsx`.
+
 ## Estrutura
 
 Na raiz: `schema.sql` (tabelas, FKs, índices GIST), `collectors.py`, `demo.py` e `main.py` (API REST); os componentes React e a configuração do Vite/TypeScript também ficam na raiz.

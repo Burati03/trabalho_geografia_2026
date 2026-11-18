@@ -1,0 +1,8 @@
+.env
+.env.*
+.git
+.vite
+dist
+node_modules
+**/__pycache__
+*.py[cod]

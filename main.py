@@ -26,10 +26,10 @@ async def lifespan(app):
     else:
         demo.limpar()
     sch = BackgroundScheduler(timezone="UTC")
-    sch.add_job(c.firms, "interval", hours=3)      # FIRMS NRT atualiza algumas vezes ao dia
-    sch.add_job(c.deter, "interval", hours=24)     # DETER: atualização diária
+    sch.add_job(c.firms, "interval", hours=3)
+    sch.add_job(c.deter, "interval", hours=24)
     for fn in (c.ibge_biomas_se_preciso, c.firms, c.deter):
-        sch.add_job(fn)                            # uma execução imediata
+        sch.add_job(fn)
     c.atribuir_biomas()
     sch.start()
     yield
@@ -68,7 +68,7 @@ def indicadores(f: F = Depends()):
     top = db.one(f"SELECT b.nome, count(*) total {BASE} WHERE {w} AND b.id IS NOT NULL GROUP BY b.nome ORDER BY total DESC LIMIT 1", p)
     return {"total_alertas": r["total"], "area_ha": r["area"], "focos": r["focos"], "bioma_top": top,
             "recentes_7d": db.one("SELECT count(*) n FROM alertas WHERE data_ocorrencia>=current_date-7")["n"],
-            "remanescente_ha": None,  # exige MapBiomas/PRODES (ainda não integrados)
+            "remanescente_ha": None,
             "tem_demo": db.one("SELECT EXISTS(SELECT 1 FROM alertas WHERE demo) e")["e"],
             "fontes": db.rows(f"SELECT DISTINCT f.chave, f.nome_instituicao nome, f.ultima_atualizacao, f.status_integracao status {BASE} WHERE {w}", p)}
 
@@ -168,7 +168,6 @@ def coletar(chave: str, x_admin_token: str = Header(default="")):
     return {"iniciado": chave}
 
 
-# ---- Serve o frontend compilado em http://localhost:8000 ----
 _DIST = next((p for p in (Path("/srv/static"), Path(__file__).resolve().parents[2] / "frontend" / "dist") if p.exists()), None)
 if _DIST:
     app.mount("/assets", StaticFiles(directory=_DIST / "assets"), name="assets")

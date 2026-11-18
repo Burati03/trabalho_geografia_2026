@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Filtros, R, useApi } from "./api";
 import MapView from "./MapView";
-import { BIOMA_COR, COR_TIPO, Estado, FiltroBar, TIPOS, dh, iso, nf } from "./ui";
+import { BIOMA_COR, COR_TIPO, EIXO, Estado, FiltroBar, GRADE, TIPOS, TooltipBox, dh, iso, nf } from "./ui";
 import { ROTULO_TOTAIS_INFORMADOS, totalInformadoBioma } from "./totaisInformados";
 
 export function BiomasLista() {
@@ -40,6 +40,7 @@ export function BiomaDetalhe() {
       {b && <>
         <header className="topo bioma-topo" style={{ ["--cor" as any]: BIOMA_COR[slug!] }}>
           <Link to="/biomas">‹ Biomas</Link><h2>{b.nome}</h2><p>{b.descricao}</p>
+          <p><Link className="link-ac" to={`/aprenda/${slug}`}>Aprenda sobre este bioma</Link></p>
         </header>
         <section className="boletim">
           <div><span>Área territorial</span><strong>{b.area_total ? nf(b.area_total / 1e6, 1) + " mi ha" : "Aguardando IBGE"}</strong></div>
@@ -55,18 +56,18 @@ export function BiomaDetalhe() {
         <div className="grade">
           <section className="painel largo"><h3>Alertas por semana</h3>
             <Estado erro={ser.erro} carregando={ser.carregando} vazio={ser.data?.length === 0 && "Sem alertas neste bioma no período."}>
-              <ResponsiveContainer height={240}><LineChart data={ser.data || []}><CartesianGrid stroke="#E3EAE4" /><XAxis dataKey="periodo" fontSize={12} /><YAxis fontSize={12} allowDecimals={false} /><Tooltip /><Legend formatter={(k) => TIPOS[k] || k} />
-                {Object.keys(TIPOS).map((k) => <Line key={k} dataKey={k} stroke={COR_TIPO[k]} strokeWidth={2} dot={false} />)}</LineChart></ResponsiveContainer>
+              <ResponsiveContainer height={240}><LineChart data={ser.data || []}><CartesianGrid stroke={GRADE} vertical={false} /><XAxis dataKey="periodo" {...EIXO} /><YAxis {...EIXO} allowDecimals={false} /><Tooltip content={<TooltipBox />} /><Legend />
+                {Object.keys(TIPOS).map((k) => <Line key={k} type="monotone" dataKey={k} name={TIPOS[k]} stroke={COR_TIPO[k]} strokeWidth={2.5} dot={false} />)}</LineChart></ResponsiveContainer>
             </Estado></section>
           <section className="painel"><h3>Histórico anual de desmatamento (ha)</h3>
             <Estado vazio={b.historico.length === 0 && "Série anual ainda não carregada: depende da integração com PRODES/MapBiomas."}>
-              <ResponsiveContainer height={240}><BarChart data={(b.historico || []).map((h: R) => ({ ...h, area_desmatada: Number(h.area_desmatada), area_queimada: Number(h.area_queimada) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="ano" fontSize={12} /><YAxis fontSize={12} /><Tooltip /><Legend />
-                <Bar dataKey="area_desmatada" name="Desmatada" fill="#DC4545" /><Bar dataKey="area_queimada" name="Queimada" fill="#E99A32" /></BarChart></ResponsiveContainer>
+              <ResponsiveContainer height={240}><BarChart data={(b.historico || []).map((h: R) => ({ ...h, area_desmatada: Number(h.area_desmatada), area_queimada: Number(h.area_queimada) }))}><CartesianGrid stroke={GRADE} vertical={false} /><XAxis dataKey="ano" {...EIXO} /><YAxis {...EIXO} /><Tooltip content={<TooltipBox />} cursor={{ fill: "rgba(15,58,38,.06)" }} /><Legend />
+                <Bar dataKey="area_desmatada" name="Desmatada" fill="#DC4545" radius={[6, 6, 0, 0]} /><Bar dataKey="area_queimada" name="Queimada" fill="#E99A32" radius={[6, 6, 0, 0]} /></BarChart></ResponsiveContainer>
             </Estado></section>
           <section className="painel"><h3>Impacto por tipo (ha)</h3>
             <Estado vazio={tp.data?.length === 0 && "Sem dados no período."}>
-              <ResponsiveContainer height={240}><BarChart data={(tp.data || []).map((t) => ({ nome: TIPOS[t.tipo], tipo: t.tipo, area: Number(t.area) }))}><CartesianGrid stroke="#E3EAE4" vertical={false} /><XAxis dataKey="nome" fontSize={12} /><YAxis fontSize={12} /><Tooltip />
-                <Bar dataKey="area" name="Hectares">{tp.data?.map((t) => <Cell key={t.tipo} fill={COR_TIPO[t.tipo]} />)}</Bar></BarChart></ResponsiveContainer>
+              <ResponsiveContainer height={240}><BarChart data={(tp.data || []).map((t) => ({ nome: TIPOS[t.tipo], tipo: t.tipo, area: Number(t.area) }))}><CartesianGrid stroke={GRADE} vertical={false} /><XAxis dataKey="nome" {...EIXO} /><YAxis {...EIXO} /><Tooltip content={<TooltipBox />} cursor={{ fill: "rgba(15,58,38,.06)" }} />
+                <Bar dataKey="area" name="Hectares" radius={[6, 6, 0, 0]}>{tp.data?.map((t) => <Cell key={t.tipo} fill={COR_TIPO[t.tipo]} />)}</Bar></BarChart></ResponsiveContainer>
             </Estado></section>
         </div>
         <h3 className="sub">Regiões afetadas</h3>
