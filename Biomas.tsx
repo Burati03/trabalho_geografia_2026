@@ -16,7 +16,8 @@ export function BiomasLista() {
           <Link key={x.slug} to={`/biomas/${x.slug}`} className="bioma" style={{ ["--cor" as any]: BIOMA_COR[x.slug] }}>
             <h3>{x.nome}</h3><p>{x.descricao}</p>
             <dl><div><dt>Área</dt><dd>{x.area_total ? nf(x.area_total / 1e6, 1) + " mi ha" : "—"}</dd></div>
-              <div><dt>Alertas reais</dt><dd>{Number(x.alertas || 0) === 0 ? "Sem alertas" : nf(x.alertas)}</dd></div>
+              <div><dt>Alertas reais</dt><dd>{Number(x.alertas_reais || 0) === 0 ? "Sem alertas" : nf(x.alertas_reais)}</dd></div>
+              <div><dt>Alertas de demonstração</dt><dd>{nf(x.alertas_demo || 0)}</dd></div>
               <div><dt>Total agregado informado</dt><dd>{nf(totalInformadoBioma(x.slug))}</dd></div></dl>
           </Link>))}</div>
         <p className="nota">{ROTULO_TOTAIS_INFORMADOS} Os totais agregados não são alertas individuais nem respondem aos filtros.</p>
@@ -46,10 +47,11 @@ export function BiomaDetalhe() {
           <div><span>Área territorial</span><strong>{b.area_total ? nf(b.area_total / 1e6, 1) + " mi ha" : "Aguardando IBGE"}</strong></div>
           <div><span>Vegetação nativa remanescente</span><strong className={b.percentual_remanescente == null ? "pendente" : ""}>{b.percentual_remanescente == null ? "Aguardando MapBiomas" : nf(b.percentual_remanescente, 1) + "%"}</strong></div>
           <div><span>Clima predominante</span><strong className="texto">{b.clima}</strong></div>
-          <div><span>Alertas reais no período</span><strong>{nf(total)}</strong></div>
+          <div><span>Alertas no período{b.alertas_demo > 0 ? " (inclui demonstração)" : ""}</span><strong>{nf(total)}</strong></div>
           <div><span>Total agregado informado</span><strong>{nf(totalInformado)}</strong></div>
           <div><span>Área afetada (ha)</span><strong>{nf(area, 1)}</strong></div>
         </section>
+        {b.alertas_demo > 0 && <p className="demo">Este bioma inclui {nf(b.alertas_demo)} alertas sintéticos de demonstração; os gráficos podem incluí-los. Não representam ocorrências reais.</p>}
         {totalInformado != null && <p className="nota">{ROTULO_TOTAIS_INFORMADOS} Este número não é filtrado pelo período escolhido.</p>}
         <p className="fonte">Principais ameaças: {b.ameacas?.join("; ")}. Limites atualizados em {dh(b.data_atualizacao)}.</p>
         <FiltroBar v={f} onChange={setF} ocultar={["bioma", "uf", "prioridade", "tipo"]} />

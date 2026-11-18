@@ -17,6 +17,55 @@ export const VIDEOS: Video[] = [
     bioma: "geral",
     assunto: "Introdução",
   },
+  {
+    id: "SpHw2y4EfHg",
+    titulo: "O Que Você NÃO Sabe Sobre a Amazônia - Documentário Completo",
+    instituicao: "Atlas Doc",
+    bioma: "amazonia",
+    assunto: "Introdução",
+  },
+  {
+    id: "nlDCeQRJj5U",
+    titulo: "Cerrado Brasileiro — Onde a Vida Resiste na Savana Mais Biodiversa do Mundo",
+    instituicao: "Wild Nature - Português",
+    bioma: "cerrado",
+    assunto: "Introdução",
+  },
+  {
+    id: "2q5mpWP3JZw",
+    titulo: "Mata Atlântica: A Floresta Mais Ameaçada do Brasil",
+    instituicao: "Planeta Pulsante",
+    bioma: "mata-atlantica",
+    assunto: "Ameaças",
+  },
+  {
+    id: "XcIU8knKpzo",
+    titulo: "Caatinga: O Bioma Mais Surpreendente do Mundo",
+    instituicao: "Mundo Feroz",
+    bioma: "caatinga",
+    assunto: "Introdução",
+  },
+  {
+    id: "At-1KfyUwBo",
+    titulo: "Pampa: a natureza selvagem e o homem vivendo em harmonia",
+    instituicao: "TV Brasil (Nossos Biomas)",
+    bioma: "pampa",
+    assunto: "Introdução",
+  },
+  {
+    id: "GzMdBydiu1s",
+    titulo: "Pantanal: South America's Nature at Its Wildest",
+    instituicao: "space and science",
+    bioma: "pantanal",
+    assunto: "Introdução",
+  },
+  {
+    id: "fQXyPT62kL8",
+    titulo: "Sistema costeiro marinho",
+    instituicao: "Pó de giz digital",
+    bioma: "costeiro-marinho",
+    assunto: "Introdução",
+  },
 ];
 
 export const ytWatch = (id: string) => `https://www.youtube.com/watch?v=${id}`;

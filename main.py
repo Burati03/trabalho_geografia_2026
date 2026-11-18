@@ -93,8 +93,12 @@ def por_tipo(f: F = Depends()):
 @app.get("/api/biomas")
 def biomas(de: date | None = None, ate: date | None = None):
     return db.rows("""SELECT b.id,b.slug,b.nome,b.descricao,b.area_total,b.percentual_remanescente,b.clima,b.ameacas,
-      b.data_atualizacao,(b.geometria IS NOT NULL) tem_geometria,COALESCE(s.total,0) alertas,COALESCE(s.area,0) area_afetada
-      FROM biomas b LEFT JOIN (SELECT bioma_id,count(*) total,sum(area_afetada) area FROM alertas
+      b.data_atualizacao,(b.geometria IS NOT NULL) tem_geometria,COALESCE(s.total,0) alertas,
+      COALESCE(s.reais,0) alertas_reais,COALESCE(s.demo,0) alertas_demo,
+      COALESCE(s.area,0) area_afetada
+      FROM biomas b LEFT JOIN (SELECT bioma_id,count(*) total,
+        count(*) FILTER (WHERE NOT demo) reais,count(*) FILTER (WHERE demo) demo,
+        sum(area_afetada) area FROM alertas
         WHERE (%(de)s::date IS NULL OR data_ocorrencia>=%(de)s) AND (%(ate)s::date IS NULL OR data_ocorrencia<=%(ate)s)
         GROUP BY bioma_id) s ON s.bioma_id=b.id ORDER BY b.id""", {"de": de, "ate": ate})
 
@@ -109,7 +113,8 @@ def biomas_geojson():
 @app.get("/api/biomas/{slug}")
 def bioma(slug: str):
     b = db.one("""SELECT id,slug,nome,descricao,area_total,percentual_remanescente,clima,ameacas,data_atualizacao,
-      CASE WHEN geometria IS NULL THEN NULL ELSE ARRAY[ST_XMin(geometria),ST_YMin(geometria),ST_XMax(geometria),ST_YMax(geometria)] END bbox
+      CASE WHEN geometria IS NULL THEN NULL ELSE ARRAY[ST_XMin(geometria),ST_YMin(geometria),ST_XMax(geometria),ST_YMax(geometria)] END bbox,
+      (SELECT count(*) FROM alertas WHERE bioma_id=biomas.id AND demo) alertas_demo
       FROM biomas WHERE slug=%s""", (slug,))
     if not b:
         raise HTTPException(404, "Bioma não encontrado")

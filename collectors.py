@@ -8,7 +8,6 @@ else:
     import db
 
 H = {"User-Agent": "biomas-monitor/1.0 (projeto academico)"}
-# CONFIRME este endereço no site do IBGE antes de usar (ou defina IBGE_BIOMAS_URL).
 IBGE_PADRAO = "https://geoftp.ibge.gov.br/informacoes_ambientais/estudos_ambientais/biomas/vetores/Biomas_250mil.zip"
 PRIORIDADE = """CASE WHEN {a} >= 100 THEN 'critica' WHEN {a} >= 25 THEN 'alta' WHEN {a} >= 5 THEN 'media' ELSE 'baixa' END"""
 
@@ -27,12 +26,10 @@ def atribuir_biomas():
 
 
 def descartar_fora_do_brasil(chave):
-    # Só descarta quando os limites do IBGE já foram carregados.
     db.run("DELETE FROM alertas WHERE bioma_id IS NULL AND fonte_id=(SELECT id FROM fontes_dados WHERE chave=%s) "
            "AND EXISTS (SELECT 1 FROM biomas WHERE geometria IS NOT NULL)", (chave,))
 
 
-# ---------- NASA FIRMS ----------
 SQL_FIRMS = """INSERT INTO alertas (id_externo, latitude, longitude, data_ocorrencia, tipo_impacto, descricao,
   fonte_id, nivel_prioridade, status)
   VALUES (%(id)s, %(lat)s, %(lon)s, %(data)s, 'queimada', %(desc)s,
@@ -66,7 +63,6 @@ def firms():
         registrar("nasa_firms", "erro", str(e)[:300])
 
 
-# ---------- INPE DETER (TerraBrasilis, WFS) ----------
 SQL_DETER = f"""WITH g AS (SELECT ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326) AS geom)
 INSERT INTO alertas (id_externo, latitude, longitude, area_afetada, data_ocorrencia, tipo_impacto, descricao,
   fonte_id, nivel_prioridade, status, uf)
@@ -112,7 +108,6 @@ def deter():
         registrar("inpe_deter", "erro", f"{str(e)[:250]} — confirme DETER_WFS/DETER_LAYERS via GetCapabilities.")
 
 
-# ---------- IBGE: limites dos biomas ----------
 NOMES = {"amazonia": "amazonia", "caatinga": "caatinga", "cerrado": "cerrado", "mataatlantica": "mata-atlantica",
          "pampa": "pampa", "pantanal": "pantanal", "sistemacosteiromarinho": "costeiro-marinho"}
 
